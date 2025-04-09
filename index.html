@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>MIDI Polyphonic Synth</title>
+    <script src="synth.js" type="module"></script>
+    <style>
+        body {
+            font-family: sans-serif;
+            line-height: 1.6;
+            max-width: 700px;
+            margin: 3em auto;
+            padding: 0 1em;
+            background: #f7f7f7;
+            color: #333;
+        }
+        pre {
+            background: #eee;
+            padding: 1em;
+            overflow-x: auto;
+            font-size: 0.95em;
+        }
+        code {
+            font-family: monospace;
+        }
+    </style>
+</head>
+<body>
+    <button>Start Audio</button>
+    <div>
+        <select id="keySelect"></select>
+        <select id="scaleSelect"></select>
+    </div>
+    <h1>How We're Going to Make the <code>scaleMap</code> Function</h1>
+
+    <p>
+        The <code>scaleMap</code> function is designed to take any MIDI note number and "snap" it down to the nearest note within a chosen scale.
+        This is useful when you want to make sure all notes played conform to a scale like C Major or A Minor.
+    </p>
+
+    <h2>The Idea</h2>
+    <p>
+        We’ll use a recursive approach to do this. Here’s how it works:
+    </p>
+    <ul>
+        <li>We take the input note and check if it's in the current scale.</li>
+        <li>If it is, we return it.</li>
+        <li>If it isn’t, we subtract 1 and try again—until we find a match.</li>
+    </ul>
+
+    <h2>Key Concepts</h2>
+    <ul>
+        <li><strong>Modulo 12</strong>: We use <code>noteIn % 12</code> to get the pitch class (e.g. C, C#, D...B), ignoring the octave.</li>
+        <li><strong>Recursion</strong>: The function calls itself with <code>noteIn - 1</code> until it finds a scale match.</li>
+    </ul>
+
+    <h2>The Function</h2>
+    <pre><code>const scaleMap = function(noteIn) {
+  // Check if note is in the scale (regardless of octave)
+  if (currentScale.includes(noteIn % 12)) {
+    return noteIn;
+  } else {
+    // Try the next note down
+    return scaleMap(noteIn - 1);
+  }
+};</code></pre>
+
+    <h2>Example</h2>
+    <p>
+        If <code>currentScale = [0, 2, 4, 5, 7, 9, 11]</code> (C Major) and you pass in <code>62</code> (D), you'll get <code>62</code> back.
+        If you pass in <code>63</code> (D#), it isn't in the scale, so the function calls itself again with <code>62</code>, then <code>61</code>, etc.,
+        until it finds a note that is in the scale.
+    </p>
+
+    <h2>Why This Is Cool</h2>
+    <p>
+        It’s a clean and flexible way to constrain incoming data (like random MIDI notes) to musical scales — without using loops!
+        You could modify it later to go up instead of down, or even pick the closest note.
+    </p>
+
+</body>
+</html>
